@@ -21,6 +21,10 @@ class NewIssue(QtGui.QMainWindow):
         super(NewIssue, self).__init__()
         
         self.initUI()
+
+    def createissue(self):
+    	#curl -H "Authorization: token 3d846b63a81730fd5651b3f8184dd932664704fc" https://api.github.com
+    	pass
         
     def initUI(self):               
         
@@ -32,12 +36,15 @@ class NewIssue(QtGui.QMainWindow):
 
         txt_reponame = QtGui.QLineEdit (self)
         txt_reponame.setToolTip('The <b>new issue\'s</b> complete repository name (user/repository)')
+        txt_reponame.setText('sicarul/isshub')
 
         txt_issname = QtGui.QLineEdit (self)
         txt_issname.setToolTip('The <b>new issue\'s</b> title')
+        txt_issname.setText('Test issue')
 
         txt_issdesc = QtGui.QTextEdit (self)
         txt_issdesc.setToolTip('A description of the issue')
+        txt_issdesc.setText('This is just a test issue')
 
         btn_create = QtGui.QPushButton ('Create issue',self)
         btn_create.setToolTip('Create the issue')
