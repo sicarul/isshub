@@ -8,11 +8,15 @@ Using python with qt4
 
 author: Pablo Alejandro Seibelt
 website: www.sicarul.com.ar
-last edited: December 2013
 """
+
+#Username - case sensitive, a-z A-Z 0-9 - (dash), cannot begin with dash
+#Reponame - case sensitive, a-z A-Z 0-9 - (dash)
 
 import sys
 from PyQt4 import QtGui, QtCore
+import requests
+import json
 
 
 class NewIssue(QtGui.QMainWindow):
@@ -23,44 +27,57 @@ class NewIssue(QtGui.QMainWindow):
         self.initUI()
 
     def createissue(self):
-    	#curl -H "Authorization: token 3d846b63a81730fd5651b3f8184dd932664704fc" https://api.github.com
-    	pass
+    	reponame = "%s" % self.txt_reponame.text()
+    	issname = "%s" % self.txt_issname.text()
+    	issdesc = "%s" % self.txt_issdesc.toPlainText()
+
+    	with open ("mytoken.txt", "r") as myfile:
+    		token=myfile.read().replace('\n', '')
+
+    	payload = {'title': issname, 'body': issdesc}
+    	r = requests.post('https://api.github.com/repos/' + reponame + '/issues',
+    		headers={'Authorization': 'token ' + token},
+    		data=json.dumps(payload)
+    		)
+    	print r.text
+    	
         
     def initUI(self):               
         
 
         self.statusBar().showMessage('')
 
-        cw = QtGui.QWidget()
-        self.setCentralWidget(cw)
+        self.cw = QtGui.QWidget()
+        self.setCentralWidget(self.cw)
 
-        txt_reponame = QtGui.QLineEdit (self)
-        txt_reponame.setToolTip('The <b>new issue\'s</b> complete repository name (user/repository)')
-        txt_reponame.setText('sicarul/isshub')
+        self.txt_reponame = QtGui.QLineEdit (self)
+        self.txt_reponame.setToolTip('The <b>new issue\'s</b> complete repository name (user/repository)')
+        self.txt_reponame.setText('sicarul/isshub')
 
-        txt_issname = QtGui.QLineEdit (self)
-        txt_issname.setToolTip('The <b>new issue\'s</b> title')
-        txt_issname.setText('Test issue')
+        self.txt_issname = QtGui.QLineEdit (self)
+        self.txt_issname.setToolTip('The <b>new issue\'s</b> title')
+        self.txt_issname.setText('Test issue')
 
-        txt_issdesc = QtGui.QTextEdit (self)
-        txt_issdesc.setToolTip('A description of the issue')
-        txt_issdesc.setText('This is just a test issue')
+        self.txt_issdesc = QtGui.QTextEdit (self)
+        self.txt_issdesc.setToolTip('A description of the issue')
+        self.txt_issdesc.setText('This is just a test issue')
 
-        btn_create = QtGui.QPushButton ('Create issue',self)
-        btn_create.setToolTip('Create the issue')
+        self.btn_create = QtGui.QPushButton ('Create issue',self)
+        self.btn_create.setToolTip('Create the issue')
+        self.btn_create.clicked.connect(self.createissue)
 
-        hbox = QtGui.QHBoxLayout()
-        hbox.addStretch(1)
-        hbox.addWidget(btn_create)
+        self.hbox = QtGui.QHBoxLayout()
+        self.hbox.addStretch(1)
+        self.hbox.addWidget(self.btn_create)
 
-        vbox = QtGui.QVBoxLayout()
-        vbox.addWidget(txt_reponame)
-        vbox.addWidget(txt_issname)
-        vbox.addWidget(txt_issdesc)
-        vbox.addLayout(hbox)
-        vbox.addStretch(1)
+        self.vbox = QtGui.QVBoxLayout()
+        self.vbox.addWidget(self.txt_reponame)
+        self.vbox.addWidget(self.txt_issname)
+        self.vbox.addWidget(self.txt_issdesc)
+        self.vbox.addLayout(self.hbox)
+        self.vbox.addStretch(1)
         
-        cw.setLayout(vbox) 
+        self.cw.setLayout(self.vbox) 
         self.setGeometry(200, 200, 800, 300)
         self.center()
         self.setWindowTitle('isshub - New issue')    
