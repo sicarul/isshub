@@ -1,0 +1,5 @@
+PyQt4
+sip
+
+cp -R /usr/lib/python2.7/dist-packages/PyQt4 lib/python2.7/site-packages/
+cp /usr/lib/python2.7/dist-packages/sip.so lib/python2.7/site-packages/
