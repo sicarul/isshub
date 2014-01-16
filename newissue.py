@@ -14,9 +14,8 @@ website: www.sicarul.com.ar
 #Reponame - case sensitive, a-z A-Z 0-9 - (dash)
 
 import sys
-from PyQt4 import QtGui, QtCore
-import requests
-import json
+from PySide import QtGui, QtCore
+import github_api
 
 
 class NewIssue(QtGui.QMainWindow):
@@ -26,21 +25,23 @@ class NewIssue(QtGui.QMainWindow):
         
         self.initUI()
 
-    def createissue(self):
-    	reponame = "%s" % self.txt_reponame.text()
-    	issname = "%s" % self.txt_issname.text()
-    	issdesc = "%s" % self.txt_issdesc.toPlainText()
 
-    	with open ("mytoken.txt", "r") as myfile:
-    		token=myfile.read().replace('\n', '')
+    def showError(self, msg):
+      QtGui.QMessageBox.about(self, "ERROR", "%s" % msg )
+      
 
-    	payload = {'title': issname, 'body': issdesc}
-    	r = requests.post('https://api.github.com/repos/' + reponame + '/issues',
-    		headers={'Authorization': 'token ' + token},
-    		data=json.dumps(payload)
-    		)
-    	print r.text
-    	
+    def create_issue(self):
+      reponame = self.txt_reponame.text()
+      issname =  self.txt_issname.text()
+      issdesc = self.txt_issdesc.toPlainText()
+
+      status = github_api.create_issue(reponame, issname, issdesc)
+
+      if status == "Ok":
+        self.close()
+      else:
+        self.showError("An error has ocurred trying to create the issue: " + status)
+      
         
     def initUI(self):               
         
@@ -64,7 +65,7 @@ class NewIssue(QtGui.QMainWindow):
 
         self.btn_create = QtGui.QPushButton ('Create issue',self)
         self.btn_create.setToolTip('Create the issue')
-        self.btn_create.clicked.connect(self.createissue)
+        self.btn_create.clicked.connect(self.create_issue)
 
         self.hbox = QtGui.QHBoxLayout()
         self.hbox.addStretch(1)
